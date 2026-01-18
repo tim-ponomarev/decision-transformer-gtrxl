@@ -1,0 +1,30 @@
+# Decision Transformer + GTrXL + World Model config for GridWorld toy env
+
+# Env dims
+state_dim: 5
+action_dim: 5
+
+# Model
+hidden_dim: 256
+num_heads: 8
+num_layers: 6
+max_seq_len: 600   # 200 timesteps × 3 tokens per timestep (R, s, a)
+max_timesteps: 256  # max absolute timestep index (env episode length + buffer)
+use_world_model: true
+world_model_weight: 0.1
+
+# Training
+data_path: "data/traj.pt"
+batch_size: 64
+context_len: 30
+num_epochs: 20
+learning_rate: 0.0003
+weight_decay: 0.01
+warmup_steps: 1000
+grad_clip: 1.0
+
+# Meta
+seed: 42
+output_dir: "outputs/dt-gtrxl-wm"
+wandb_project: "dt-gtrxl"
+run_name: "dt-gtrxl-wm-r16"
