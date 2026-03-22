@@ -1,0 +1,32 @@
+# Smoke test config — tiny model, few steps, CPU-friendly, runs in ~60 seconds
+# Purpose: end-to-end sanity check that the pipeline works (training doesn't diverge,
+# eval doesn't crash). NOT for real results.
+
+# Env dims
+state_dim: 5
+action_dim: 5
+
+# Model — scaled down 10×
+hidden_dim: 64
+num_heads: 4
+num_layers: 2
+max_seq_len: 90   # 30 timesteps × 3 tokens
+max_timesteps: 256  # max absolute timestep index, covers episode length
+use_world_model: true
+world_model_weight: 0.1
+
+# Training
+data_path: "data/traj_smoke.pt"
+batch_size: 16
+context_len: 10
+num_epochs: 2
+learning_rate: 0.0003
+weight_decay: 0.01
+warmup_steps: 20
+grad_clip: 1.0
+
+# Meta
+seed: 42
+output_dir: "outputs/smoke"
+wandb_project: "dt-gtrxl"
+run_name: "smoke-test"
