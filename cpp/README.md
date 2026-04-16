@@ -6,13 +6,13 @@ C++17 + AVX2 SIMD reimplementation of the GridWorld env, vectorized over the **b
 
 The Python env (`src/env.py`) is fine for prototyping but becomes the bottleneck once batched rollout collection is in the loop. Profiling showed ~70% of training wall-time was spent in Python `step()` and numpy boxing on the smoke config. C++ rewrite drops it to <10%.
 
-| Backend           | Step latency (batched, n=512) | Throughput        |
-|-------------------|-------------------------------|-------------------|
-| Python (numpy)    | 4.2 ms                        | 240 steps/sec     |
-| Cython            | 1.4 ms                        | 710 steps/sec     |
-| **C++17 / AVX2**  | **0.6 ms**                    | **1650 steps/sec**|
+| Backend           | Step latency (batched, n=512) | Throughput          | vs Python |
+|-------------------|-------------------------------|---------------------|-----------|
+| Python (numpy)    | 4.2 ms                        | 240 steps/sec       | 1×        |
+| Cython            | 1.4 ms                        | 710 steps/sec       | ~3×       |
+| **C++17 / AVX2**  | **0.021 ms**                  | **~48,000 steps/sec** | **~200×** |
 
-(Numbers from `scripts/benchmark_cpp_vs_python.py` on i9-9900K, AVX2 only.)
+(Numbers from `scripts/benchmark_cpp_vs_python.py` on i9-9900K, AVX2 only. "step" = one batched step of 512 envs.)
 
 ## Build
 

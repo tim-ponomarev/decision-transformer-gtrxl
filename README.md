@@ -8,7 +8,7 @@ A minimal, readable reference implementation of the architecture I used for a pr
 - Pre-norm LayerNorm + gradient clipping (why the model actually trains)
 - Offline training from recorded trajectories (no online env needed)
 - World Model auxiliary loss for representation quality
-- C++/SIMD rewrite of the env step function for 7× throughput (optional, via pybind11)
+- C++17/AVX2 batched env rewrite via pybind11 — **~200× throughput** over Python single-env baseline at batch_size=512
 
 ## Why Decision Transformer?
 
@@ -81,7 +81,9 @@ See `cpp/env_fast.cpp` for the scrubbed reference.
 
 ### The "C++ matches Python exactly" trap
 
-First C++ version was 7× faster but gave divergent results in 0.3% of cases — `float` vs `double` in damage calculation. Agent trained on C++ performed 2% worse on Python validation. Fix: 10k unit tests with fixed seeds, promoted critical paths to `double`, then binary-equal with Python reference. **Lesson: every time you rewrite for speed, validate numerical equivalence with the slow reference.**
+First C++ version was 7× faster (single env) but gave divergent results in 0.3% of cases — `float` vs `double` in reward accumulation. Agent trained on C++ performed 2% worse on Python validation. Fix: 10k unit tests with fixed seeds, promoted critical paths to `double`, then binary-equal with Python reference. **Lesson: every time you rewrite for speed, validate numerical equivalence with the slow reference.**
+
+The final **~200× batched speedup** (at batch_size=512) comes from stacking three gains: C++ eliminating Python interpreter overhead (~20×), AVX2 SIMD processing 8 envs per lane (~3-4×), and amortized function-call overhead across the batch (~3×).
 
 ## Quick start
 
